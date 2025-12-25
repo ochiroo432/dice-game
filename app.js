@@ -1,62 +1,59 @@
-//  toglogchiin eeljiig  hadgalah huvisagch, negdvgeer toglogch 0,hoerdugaar toglogchiig 1 gej tendegley,
+// ========================================
+// TOGLOMGIIN STATE: ЕЭЛЖ, ОНОО, ШОО
+// ========================================
 
-var activPlayer = 1;
+// Тоглогчийн ээлжийг хадгалах хувьсагч
+// 0 = Нэгдүгээр тоглогч, 1 = Хоёрдугаар тоглогч
+var activePlayer = 0;
 
+// Тоглогчдын нийт оноог хадгалах массив
+var scores = [0, 0];
 
-
-
-
-
-// toglogchiin tsugluulsan onoog hadgalah huvsagch 
-var scors = [0, 0,];
-
-
-// toglochiin eeljendee tsugluulj baigaa onooog hadgalah huwisagch 
+// Тоглогч ээлжиндээ цуглуулж байгаа оноо
 var roundScore = 0;
 
+// Тоглоом эхлэхэд бүх оноог 0 болгож дэлгэцэнд харуулна
+document.getElementById("score-0").textContent = "0";
+document.getElementById("score-1").textContent = "0";
+document.getElementById("current-0").textContent = "0";
+document.getElementById("current-1").textContent = "0";
 
+// Шооны элемент DOM-аас олж авах
+var diceDom = document.querySelector(".dice");
+diceDom.style.display = "none"; // Эхэндээ шоо нуух
 
+// ========================================
+// ШОО ШИДЭХ EVENT LISTENER
+// ========================================
+document.querySelector(".btn-roll").addEventListener("click", function () {
 
-// shoo ali talaaraa buusaniig hadgalah huvisagch heregtei , 1-6 gesen utagiig ene huvisagchid sanamsarguigeer vvsgej ogno 
-
-
-var diceNumber = Math.floor(Math.random() * 6) + 1;
-
-
-//  <div class="player-score" id="score-0">43</div>
-
-// window.document.querySelector('#score-0').textContent = dice;
-
-// window.document.querySelector('#score-1').textContent = dice;
-
-
-
-
-
-window.document.getElementById('score-0').textContent = '0';
-window.document.getElementById('score-1').textContent = '0';
-
-window.document.getElementById('current-0').textContent = '0';
-window.document.getElementById('current-1').textContent = '0';
-
-
-// document.querySelector('.dice').style.dicplay = 'none';
-var diceDom = document.querySelector('.dice');
-
-diceDom.style.display = "none";
-
-document.querySelector(".btn-roll").addEventListener("click", function shooShid() {
-
+    // 1-6 хүртэл санамсаргүй тоо гаргах
     var diceNumber = Math.floor(Math.random() * 6) + 1;
 
+    // Шоо вэб дээр гаргах
     diceDom.style.display = "block";
-    diceDom.src = "dice-" + diceNumber + '.png';
+    diceDom.src = "dice-" + diceNumber + ".png";
 
+    // ========================================
+    // 1 буусан эсэхийг шалгах
+    // ========================================
+    if (diceNumber !== 1) {
+        // 1-ээс ялгаатай тоо буувал ээлжийн оноонд нэмэх
+        roundScore += diceNumber;
+        document.getElementById("current-" + activePlayer).textContent = roundScore;
+    } else {
+        // 1 буусан тул тоглогчийн ээлжийг солих
+        roundScore = 0; // ээлжийн оноог reset хийх
+        document.getElementById("current-" + activePlayer).textContent = "0";
 
+        // Идэвхтэй тоглогчийг солих: 0 -> 1, 1 -> 0
+        activePlayer = activePlayer === 0 ? 1 : 0;
+
+        // Шооны дүрсийг нуух
+        diceDom.style.display = "none";
+
+        // UI дээрх идэвхтэй тоглогчийн өнгийг солих
+        document.querySelector(".player-0-panel").classList.toggle("active");
+        document.querySelector(".player-1-panel").classList.toggle("active");
+    }
 });
-
-// function shooShid() {
-
-//     var diceNumber = Math.floor(Math.random() * 6) + 1;
-//     alert("shoo buulaa : " + diceNumber);
-// }
