@@ -1,59 +1,133 @@
-// ========================================
-// TOGLOMGIIN STATE: ЕЭЛЖ, ОНОО, ШОО
-// ========================================
+// Тоглоомын бүх газарт ашиглагдах глобаль хувьсагч
+// Тоглоом дууссан эсэхийг эндээр тэмдэглэнэ
+var isNewGame;
 
-// Тоглогчийн ээлжийг хадгалах хувьсагч
-// 0 = Нэгдүгээр тоглогч, 1 = Хоёрдугаар тоглогч
-var activePlayer = 0;
+// Аль тоглогч шидэх вэ гэдгийг энд хадгална.
+var activePlayer;
 
-// Тоглогчдын нийт оноог хадгалах массив
-var scores = [0, 0];
+// Хоёр тоглогчийн цуглуулсан оноонууд
+var scores;
 
-// Тоглогч ээлжиндээ цуглуулж байгаа оноо
-var roundScore = 0;
+// Идэвхтэй тоглогчийн энэ тойрогт нэмэгдсэн оноо
+var roundScore;
 
-// Тоглоом эхлэхэд бүх оноог 0 болгож дэлгэцэнд харуулна
-document.getElementById("score-0").textContent = "0";
-document.getElementById("score-1").textContent = "0";
-document.getElementById("current-0").textContent = "0";
-document.getElementById("current-1").textContent = "0";
-
-// Шооны элемент DOM-аас олж авах
+// Шооны зургийг илэрхийлэх элементийг DOM-оос хайж олно
 var diceDom = document.querySelector(".dice");
-diceDom.style.display = "none"; // Эхэндээ шоо нуух
 
-// ========================================
-// ШОО ШИДЭХ EVENT LISTENER
-// ========================================
+// Тоглоомыг эхлүүлэх
+initGame();
+
+// Тоглоомыг шинэчлэх, эхлэх үед бэлтгэх
+function initGame() {
+    // Тоглоом эхэллээ гэж тэмдэглэнэ
+    isNewGame = true;
+
+    // Идэвхтэй тоглогчийг 0 буюу эхний тоглогчоор тохируулна
+    activePlayer = 0;
+
+    // Тоглогчдын оноог 0-ээр эхлүүлнэ
+    scores = [0, 0];
+
+    // Идэвхтэй тоглогчийн ээлжийн оноог 0-ээр эхлүүлнэ
+    roundScore = 0;
+
+    // Програм эхлэхэд дэлгэцэн дээр оноонуудыг 0 болгоно
+    document.getElementById("score-0").textContent = "0";
+    document.getElementById("score-1").textContent = "0";
+    document.getElementById("current-0").textContent = "0";
+    document.getElementById("current-1").textContent = "0";
+
+    // Тоглогчдын нэрийг анхныхаар сэргээх
+    document.getElementById("name-0").textContent = "Player 1";
+    document.getElementById("name-1").textContent = "Player 2";
+
+    document.querySelector(".player-0-panel").classList.remove("winner");
+    document.querySelector(".player-1-panel").classList.remove("winner");
+
+    document.querySelector(".player-0-panel").classList.remove("active");
+    document.querySelector(".player-1-panel").classList.remove("active");
+
+    document.querySelector(".player-0-panel").classList.add("active");
+
+    diceDom.style.display = "none";
+}
+
+// Шоог шидэх event listener
 document.querySelector(".btn-roll").addEventListener("click", function () {
+    if (isNewGame) {
+        // 1-6 хүртэл санамсаргүй тоо үүсгэнэ
+        var diceNumber = Math.floor(Math.random() * 6) + 1;
 
-    // 1-6 хүртэл санамсаргүй тоо гаргах
-    var diceNumber = Math.floor(Math.random() * 6) + 1;
+        // Шоог дэлгэцэнд харуулна
+        diceDom.style.display = "block";
 
-    // Шоо вэб дээр гаргах
-    diceDom.style.display = "block";
-    diceDom.src = "dice-" + diceNumber + ".png";
+        // Шооны зургийг тохируулна
+        diceDom.src = "dice-" + diceNumber + ".png";
 
-    // ========================================
-    // 1 буусан эсэхийг шалгах
-    // ========================================
-    if (diceNumber !== 1) {
-        // 1-ээс ялгаатай тоо буувал ээлжийн оноонд нэмэх
-        roundScore += diceNumber;
-        document.getElementById("current-" + activePlayer).textContent = roundScore;
+        // Хэрвээ шооны тоо 1 биш бол оноог нэмнэ
+        if (diceNumber !== 1) {
+            // Энэ тоглогчийн ээлжийн оноог нэмнэ
+            roundScore = roundScore + diceNumber;
+            document.getElementById(
+                "current-" + activePlayer
+            ).textContent = roundScore;
+        } else {
+            // Хэрвээ шооны тоо 1 бол тоглогчийн ээлж дуусна
+            switchToNextPlayer();
+        }
     } else {
-        // 1 буусан тул тоглогчийн ээлжийг солих
-        roundScore = 0; // ээлжийн оноог reset хийх
-        document.getElementById("current-" + activePlayer).textContent = "0";
-
-        // Идэвхтэй тоглогчийг солих: 0 -> 1, 1 -> 0
-        activePlayer = activePlayer === 0 ? 1 : 0;
-
-        // Шооны дүрсийг нуух
-        diceDom.style.display = "none";
-
-        // UI дээрх идэвхтэй тоглогчийн өнгийг солих
-        document.querySelector(".player-0-panel").classList.toggle("active");
-        document.querySelector(".player-1-panel").classList.toggle("active");
+        alert("Тоглоом дууссан байна. NEW GAME товчийг дарж шинэчлэх хэрэгтэй.");
     }
 });
+
+// HOLD товчийг дарсан event listener
+document.querySelector(".btn-hold").addEventListener("click", function () {
+    if (isNewGame) {
+        // Энэ тоглогчийн нийт оноог шинэчилнэ
+        scores[activePlayer] = scores[activePlayer] + roundScore;
+
+        // Дэлгэц дээр шинэ оноог харуулна
+        document.getElementById("score-" + activePlayer).textContent =
+            scores[activePlayer];
+
+        // Хэрвээ тоглогч 10 буюу түүнээс дээш оноо авсан бол ялалт зарлана
+        if (scores[activePlayer] >= 10) {
+            // Тоглоом дууссан гэж тэмдэглэнэ
+            isNewGame = false;
+
+            // Ялагч тоглогчийн нэрийг өөрчилнө
+            document.getElementById("name-" + activePlayer).textContent = "WINNER!!!";
+            document
+                .querySelector(".player-" + activePlayer + "-panel")
+                .classList.add("winner");
+            document
+                .querySelector(".player-" + activePlayer + "-panel")
+                .classList.remove("active");
+        } else {
+            // Тоглоом үргэлжилнэ
+            switchToNextPlayer();
+        }
+    } else {
+        alert("Тоглоом дууссан байна. NEW GAME товчийг дарж шинэчлэх хэрэгтэй.");
+    }
+});
+
+// Дараагийн тоглогч руу шилжүүлэх функц
+function switchToNextPlayer() {
+    // Одоогийн тоглогчийн ээлжийн оноог 0 болгоно
+    roundScore = 0;
+    document.getElementById("current-" + activePlayer).textContent = 0;
+
+    // Тоглогчийг солино
+    activePlayer === 0 ? (activePlayer = 1) : (activePlayer = 0);
+
+    // Active class-ыг шилжүүлнэ
+    document.querySelector(".player-0-panel").classList.toggle("active");
+    document.querySelector(".player-1-panel").classList.toggle("active");
+
+    // Шоог далдлана
+    diceDom.style.display = "none";
+}
+
+// New Game товчийг дарсан үед тоглоомыг дахин эхлүүлнэ
+document.querySelector(".btn-new").addEventListener("click", initGame);
